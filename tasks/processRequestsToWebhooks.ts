@@ -12,8 +12,8 @@ class ProcessRequestsToWebhooks {
       await Promise.allSettled(
         visitWebhookStatuses.map((visitWebhookStatus) => processVisitToWebhook(repositories, visitWebhookStatus))
       );
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error);
     }
   }
 }
