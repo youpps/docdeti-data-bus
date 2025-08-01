@@ -9,7 +9,14 @@ const getVisitRatesQuery = (visit: Partial<IVisitRate>) => {
 };
 
 const createVisitRateQuery = () => {
-  return `INSERT INTO visit_rates(visitId) VALUES(:visitId)`;
+  return `INSERT INTO visit_rates(visitId,
+  didDoctorIntroduceThemselves, didDoctorGreetPatient, didDoctorUseOpenQuestion, didDoctorCommentOnObservations, 
+  didDoctorExplainResultInterpreterAndSpecialty, didDoctorExplainWhereToFindReport, wasDoctorEmpathetic, 
+  patientNegativeExperienceSummary, referralToAnotherClinicSummary) VALUES(:visitId,
+  :didDoctorIntroduceThemselves, :didDoctorGreetPatient, :didDoctorUseOpenQuestion, :didDoctorCommentOnObservations, 
+  :didDoctorExplainResultInterpreterAndSpecialty, :didDoctorExplainWhereToFindReport, :wasDoctorEmpathetic, 
+  :patientNegativeExperienceSummary, :referralToAnotherClinicSummary)
+  )`;
 };
 
 const updateVisitRateQuery = (visit: { id: number } & Partial<IVisitRate>) => {
