@@ -10,6 +10,7 @@ const getVisitsQuery = (visit: Partial<IVisit>) => {
 
 const createVisitQuery = () => {
   return `INSERT INTO visits(
+    id,
     parent,
     child,
     type,
@@ -21,6 +22,7 @@ const createVisitQuery = () => {
     doctor,
     isLast,
     address) VALUES(
+        :id,
         :parent,
         :child,
         :type,
