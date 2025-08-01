@@ -180,7 +180,14 @@ class VisitsController {
         repositories.visitRatesRepository.getOne({ visitId: params.visitId }),
       ]);
 
-      if (!visit || !visitRate) {
+      if (visitRate) {
+        return res.status(400).json({
+          status: Status.Error,
+          data: { message: "Visit rate has already been passed" },
+        });
+      }
+
+      if (!visit) {
         return res.status(400).json({
           status: Status.Error,
           data: { message: "Visit is not found" },
@@ -194,9 +201,17 @@ class VisitsController {
         });
       }
 
-      await repositories.visitRatesRepository.update({
-        id: visitRate.id,
-        ...body,
+      await repositories.visitRatesRepository.create({
+        didDoctorCommentOnObservations: body.didDoctorCommentOnObservations,
+        didDoctorExplainResultInterpreterAndSpecialty: body.didDoctorExplainResultInterpreterAndSpecialty,
+        didDoctorExplainWhereToFindReport: body.didDoctorExplainWhereToFindReport,
+        didDoctorGreetPatient: body.didDoctorGreetPatient,
+        didDoctorIntroduceThemselves: body.didDoctorIntroduceThemselves,
+        didDoctorUseOpenQuestion: body.didDoctorUseOpenQuestion,
+        wasDoctorEmpathetic: body.wasDoctorEmpathetic,
+        patientNegativeExperienceSummary: body.patientNegativeExperienceSummary,
+        referralToAnotherClinicSummary: body.referralToAnotherClinicSummary,
+        visitId: visit.id,
       });
 
       await commit();

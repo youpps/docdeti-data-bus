@@ -11,7 +11,7 @@ class VisitRatesRepository {
     return data[0] ?? null;
   }
 
-  async create(visitRate: Pick<IVisitRate, "visitId">): Promise<number> {
+  async create(visitRate: Omit<IVisitRate, "id">): Promise<number> {
     const [data]: any = await this.db.query(createVisitRateQuery(), visitRate);
 
     return data.insertId;
