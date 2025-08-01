@@ -5,6 +5,7 @@ import { Status } from "../types/status";
 import { IInitialVisit, VisitFeedbackType, VisitType } from "../types/visit";
 import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
 import { IVisitDialogMessage, VisitDialogMessageSender } from "../types/visitDialogMessage";
+import { randomInt } from "crypto";
 
 class VisitsController {
   constructor(private repositories: Repositories) {}
@@ -343,7 +344,7 @@ class VisitsController {
 
   fakeVisit = async (req: Request, res: Response) => {
     const testVisit: IInitialVisit = {
-      id: Date.now(),
+      id: randomInt(0, 4294967295),
       parent: "Alex",
       child: "Alex child",
       type: VisitType.Doctor,
