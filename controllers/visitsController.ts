@@ -89,7 +89,7 @@ class VisitsController {
 
   handleProtocol = async (req: Request, res: Response) => {
     try {
-      const paramsSchema = Joi.object({ visitId: Joi.number().min(1).required() });
+      const paramsSchema = Joi.object({ visitId: Joi.string().min(1).required() });
       const bodySchema = Joi.object({ protocol: Joi.string().min(1).required() });
 
       const { error: paramsError, value: params } = paramsSchema.validate(req.params);
@@ -153,7 +153,7 @@ class VisitsController {
 
     try {
       // Validate request
-      const paramsSchema = Joi.object({ visitId: Joi.number().min(1).required() });
+      const paramsSchema = Joi.object({ visitId: Joi.string().min(1).required() });
 
       const bodySchema = Joi.object({
         didDoctorIntroduceThemselves: Joi.valid(1, 0).required(),
@@ -251,7 +251,7 @@ class VisitsController {
 
   handleFeedback = async (req: Request, res: Response) => {
     try {
-      const paramsSchema = Joi.object({ visitId: Joi.number().min(1).required() });
+      const paramsSchema = Joi.object({ visitId: Joi.string().min(1).required() });
 
       const dialogSchema = Joi.object({
         text: Joi.string().min(1).required(),

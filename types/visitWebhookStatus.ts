@@ -27,7 +27,7 @@ const processVisitToWebhook = async (repositoriesObj: Repositories, visitWebhook
     });
 
     const json = await res.json();
-
+    
     if (json.status === Status.Success) {
       await repositories.visitWebhookStatusesRepository.update({
         id: visitWebhookStatus.id,
