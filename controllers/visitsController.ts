@@ -361,7 +361,7 @@ class VisitsController {
 
   fakeVisit = async (req: Request, res: Response) => {
     const testVisit: IInitialVisit = {
-      id: "e9424c83-6ce1-4c22-8320-21078fe6c1d8",
+      id: `e9424c83-6ce1-4c22-8320-21078fe6c${Math.random() * 10}${Math.random() * 10}${Math.random() * 10}`,
       parent: "Иванова Татьяна",
       child: "Иванов Максим",
       type: VisitType.Nurse,
