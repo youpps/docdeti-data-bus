@@ -361,7 +361,11 @@ class VisitsController {
 
   fakeVisit = async (req: Request, res: Response) => {
     const testVisit: IInitialVisit = {
-      id: `e9424c83-6ce1-4c22-8320-21078fe6c${atob(Math.random().toString())}`,
+      id: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }),
       parent: "Иванова Татьяна",
       child: "Иванов Максим",
       type: VisitType.Nurse,
