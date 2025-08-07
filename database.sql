@@ -1,7 +1,7 @@
 CREATE DATABASE docdeti;
 
 CREATE TABLE visits (
-	id INT PRIMARY KEY AUTO_INCREMENT,
+	id VARCHAR(256) PRIMARY KEY AUTO_INCREMENT,
 	parent VARCHAR(256) NOT NULL,
 	child VARCHAR(256) NOT NULL,
 	type ENUM("nurse", "doctor") NOT NULL, 
@@ -13,6 +13,9 @@ CREATE TABLE visits (
 	doctor VARCHAR(256) NOT NULL,
 	address VARCHAR(256) NOT NULL,
 	isLast BOOLEAN NOT NULL,
+
+	specialization VARCHAR(256) NOT NULL,
+	serviceName VARCHAR(256) NOT NULL,
 
 	feedbackType ENUM("positive", "negative", "nopurpose", "warning", "commercial"),
 	feedbackSummary TEXT,

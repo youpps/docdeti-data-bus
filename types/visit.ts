@@ -12,9 +12,9 @@ enum VisitFeedbackType {
 }
 
 interface IVisit {
-  id: number;
-  parent: string;
-  child: string;
+  id: string;
+  parent: string | null;
+  child: string | null;
   type: VisitType;
   recordUrl: string;
   processedAt: Date;
@@ -23,7 +23,10 @@ interface IVisit {
   comment: string;
   doctor: string;
   address: string;
+  specialization: string;
+  serviceName: string;
   isLast: 1 | 0;
+
   feedbackType: VisitFeedbackType | null;
   feedbackSummary: string | null;
   protocol: string | null;
@@ -51,6 +54,8 @@ const toInitialVisit = (visit: IVisit): IInitialVisit => {
     doctor: visit.doctor,
     address: visit.address,
     isLast: visit.isLast,
+    specialization: visit.specialization,
+    serviceName: visit.serviceName,
   };
 };
 

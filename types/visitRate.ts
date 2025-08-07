@@ -1,6 +1,6 @@
 interface IVisitRate {
   id: number;
-  visitId: number;
+  visitId: string;
   didDoctorIntroduceThemselves: number | null;
   didDoctorGreetPatient: number | null;
   didDoctorUseOpenQuestion: number | null;

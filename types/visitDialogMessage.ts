@@ -7,7 +7,7 @@ interface IVisitDialogMessage {
   id: number;
   text: string;
   sender: VisitDialogMessageSender;
-  visitId: number;
+  visitId: string;
 }
 
 export { IVisitDialogMessage, VisitDialogMessageSender };

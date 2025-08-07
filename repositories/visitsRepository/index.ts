@@ -17,13 +17,11 @@ class VisitsRepository {
     return visits[0] ?? null;
   }
 
-  async create(visit: IInitialVisit): Promise<number> {
-    const [data]: any = await this.db.query(createVisitQuery(), visit);
-
-    return data.insertId;
+  async create(visit: IInitialVisit) {
+    await this.db.query(createVisitQuery(), visit);
   }
 
-  async update(visit: { id: number } & Partial<IVisit>) {
+  async update(visit: { id: string } & Partial<IVisit>) {
     await this.db.query(updateVisitQuery(visit), visit);
   }
 }

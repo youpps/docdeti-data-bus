@@ -21,6 +21,8 @@ const createVisitQuery = () => {
     comment,
     doctor,
     isLast,
+    specialization,
+    serviceName,
     address) VALUES(
         :id,
         :parent,
@@ -33,11 +35,13 @@ const createVisitQuery = () => {
         :comment,
         :doctor,
         :isLast,
+        :specialization,
+        :serviceName,
         :address
     )`;
 };
 
-const updateVisitQuery = (visit: { id: number } & Partial<IVisit>) => {
+const updateVisitQuery = (visit: { id: string } & Partial<IVisit>) => {
   const keys = Object.keys(visit).filter((key) => (visit as any)[key] !== undefined);
   const query = keys.map((key) => `${key} = :${key} `).join(", ");
 

@@ -4,7 +4,7 @@ import { IVisit } from "./visit";
 
 interface IVisitWebhookStatus {
   id: number;
-  visitId: number;
+  visitId: string;
   webhookUrl: string;
   isSent: 1 | 0;
   lastAttempt: Date;

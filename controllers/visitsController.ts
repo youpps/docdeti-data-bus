@@ -15,7 +15,7 @@ class VisitsController {
 
     try {
       const visitSchema = Joi.object({
-        id: Joi.number().min(1).required(),
+        id: Joi.string().min(1).required(),
         parent: Joi.string().min(1).required(),
         child: Joi.string().min(1).required(),
         type: Joi.valid(VisitType.Doctor, VisitType.Nurse).required(),
@@ -26,6 +26,8 @@ class VisitsController {
         comment: Joi.string().min(1).required(),
         doctor: Joi.string().min(1).required(),
         address: Joi.string().min(1).required(),
+        specialization: Joi.string().min(1).required(),
+        serviceName: Joi.string().min(1).required(),
         isLast: Joi.valid(1, 0).required(),
       });
 
@@ -45,16 +47,16 @@ class VisitsController {
         });
       }
 
-      const [visitId, webhooks] = await Promise.all([
-        repositories.visitsRepository.create(visitData),
+      const [webhooks] = await Promise.all([
         repositories.webhooksRepository.getAll(),
+        repositories.visitsRepository.create(visitData),
       ]);
 
       const visitWebhookStatusIds = await Promise.all(
         webhooks.map((webhook) =>
           repositories.visitWebhookStatusesRepository.create({
             webhookUrl: webhook.url,
-            visitId,
+            visitId: visitData.id,
           })
         )
       );
@@ -359,17 +361,19 @@ class VisitsController {
 
   fakeVisit = async (req: Request, res: Response) => {
     const testVisit: IInitialVisit = {
-      id: randomInt(0, 4294967295),
-      parent: "Alex",
-      child: "Alex child",
-      type: VisitType.Doctor,
-      recordUrl: "https://record.url",
-      processedAt: new Date(),
-      date: new Date(),
-      phone: "79233786608",
-      comment: "Comment to visit",
-      doctor: "Doctor Sergei",
-      address: "Street",
+      id: "e9424c83-6ce1-4c22-8320-21078fe6c1d8",
+      parent: "Иванова Татьяна",
+      child: "Иванов Максим",
+      type: VisitType.Nurse,
+      recordUrl: "",
+      processedAt: new Date("2025-07-31T14:30:00Z"),
+      date: new Date("2025-07-31T14:30:00Z"),
+      phone: "+79959999999",
+      comment: "",
+      doctor: "Ильина Анна",
+      address: "г. Москва, ул. Мясницкая",
+      specialization: "Медсестра",
+      serviceName: "Альбумин (Albumin)",
       isLast: 1,
     };
 
