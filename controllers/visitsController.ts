@@ -365,7 +365,7 @@ class VisitsController {
       parent: "Иванова Татьяна",
       child: "Иванов Максим",
       type: VisitType.Nurse,
-      recordUrl: "",
+      recordUrl: "test-record",
       processedAt: new Date("2025-07-31T14:30:00Z"),
       date: new Date("2025-07-31T14:30:00Z"),
       phone: "+79959999999",
