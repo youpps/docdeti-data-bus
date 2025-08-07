@@ -385,7 +385,8 @@ class VisitsController {
       });
 
       const json = await response.json();
-      console.log("Fake visit response:", json);
+      if (json.status === Status.Error) return res.status(500).json(json);
+
       res.status(200).json(testVisit);
     } catch (error) {
       console.error("Fake visit error:", error);

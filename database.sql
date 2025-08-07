@@ -1,7 +1,7 @@
 CREATE DATABASE docdeti;
 
 CREATE TABLE visits (
-	id VARCHAR(256) PRIMARY KEY AUTO_INCREMENT,
+	id VARCHAR(256) PRIMARY KEY NOT NULL,
 	parent VARCHAR(256) NOT NULL,
 	child VARCHAR(256) NOT NULL,
 	type ENUM("nurse", "doctor") NOT NULL, 
@@ -43,7 +43,7 @@ CREATE TABLE visit_rates (
 	patientNegativeExperienceSummary TEXT,
 	referralToAnotherClinicSummary TEXT,
 	
-	visitId INT NOT NULL,
+	visitId VARCHAR(256) NOT NULL,
 
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );
@@ -54,7 +54,7 @@ CREATE TABLE visit_dialog_messages (
 	text TEXT NOT NULL,
 	sender ENUM("bot", "user") NOT NULL,
 
-	visitId INT NOT NULL,
+	visitId VARCHAR(256) NOT NULL,
 
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );
@@ -66,7 +66,7 @@ CREATE TABLE webhooks (
 
 CREATE TABLE visit_webhook_status (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  visitId INT NOT NULL,
+  visitId VARCHAR(256) NOT NULL,
   webhookUrl VARCHAR(256) NOT NULL,
   isSent BOOLEAN NOT NULL DEFAULT 0,
 
