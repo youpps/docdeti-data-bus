@@ -369,7 +369,7 @@ class VisitsController {
       processedAt: new Date("2025-07-31T14:30:00Z"),
       date: new Date("2025-07-31T14:30:00Z"),
       phone: "+79959999999",
-      comment: "",
+      comment: "test-comment",
       doctor: "Ильина Анна",
       address: "г. Москва, ул. Мясницкая",
       specialization: "Медсестра",
