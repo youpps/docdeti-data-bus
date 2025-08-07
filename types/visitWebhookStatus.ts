@@ -21,14 +21,15 @@ const processVisitToWebhook = async (repositoriesObj: Repositories, visitWebhook
       id: visitWebhookStatus.visitId,
     });
 
-    console.log(visit);
-
     const res = await fetch(visitWebhookStatus.webhookUrl, {
       method: "POST",
       body: JSON.stringify(visit),
     });
 
+    console.log(JSON.stringify(visit));
+
     const json = await res.json();
+    console.log(json);
 
     if (json.status === Status.Success) {
       await repositories.visitWebhookStatusesRepository.update({
