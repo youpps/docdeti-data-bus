@@ -24,6 +24,7 @@ const processVisitToWebhook = async (repositoriesObj: Repositories, visitWebhook
     const res = await fetch(visitWebhookStatus.webhookUrl, {
       method: "POST",
       body: JSON.stringify(visit),
+      headers: { "Content-Type": "application/json" },
     });
 
     console.log(JSON.stringify(visit));
