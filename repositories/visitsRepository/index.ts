@@ -5,25 +5,25 @@ import { createVisitQuery, getVisitsQuery, updateVisitQuery } from "./queries";
 class VisitsRepository {
   constructor(private db: mysql.Pool | mysql.Connection) {}
 
-  async getAll(visit: Partial<IVisit>): Promise<IVisit[]> {
+  getAll = async (visit: Partial<IVisit>): Promise<IVisit[]> => {
     const [data]: any = await this.db.query(getVisitsQuery(visit), visit);
 
     return data;
-  }
+  };
 
-  async getOne(visit: Partial<IVisit>): Promise<IVisit | null> {
+  getOne = async (visit: Partial<IVisit>): Promise<IVisit | null> => {
     const visits = await this.getAll(visit);
 
     return visits[0] ?? null;
-  }
+  };
 
-  async create(visit: IInitialVisit) {
+  create = async (visit: IInitialVisit) => {
     await this.db.query(createVisitQuery(), visit);
-  }
+  };
 
-  async update(visit: { id: string } & Partial<IVisit>) {
+  update = async (visit: { id: string } & Partial<IVisit>) => {
     await this.db.query(updateVisitQuery(visit), visit);
-  }
+  };
 }
 
 export { VisitsRepository };
