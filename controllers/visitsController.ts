@@ -436,18 +436,18 @@ class VisitsController {
         const v = c === "x" ? r : (r & 0x3) | 0x8;
         return v.toString(16);
       }),
-      parent: "Иванова Татьяна",
-      child: "Иванов Максим",
-      type: VisitType.Nurse,
+      parent: "Сергей Юрьевич",
+      child: "Алексей Павлов",
+      type: VisitType.Doctor,
       recordUrl: "test-record",
       processedAt: new Date("2025-07-31T14:30:00Z"),
       date: new Date("2025-07-31T14:30:00Z"),
-      phone: "+79959999999",
+      phone: "+79999999999",
       comment: "test-comment",
       doctor: "Ильина Анна",
       address: "г. Москва, ул. Мясницкая",
-      specialization: "Медсестра",
-      serviceName: "Альбумин (Albumin)",
+      specialization: "Гинеколог",
+      serviceName: "Прием (осмотр, консультация) врача-акушера-гинеколога первичный (группа А)",
       isLast: 1,
     };
 
