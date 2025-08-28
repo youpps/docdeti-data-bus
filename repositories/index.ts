@@ -5,6 +5,7 @@ import { ConnectorsRepository } from "./connectorsRepository";
 import { VisitWebhookStatusesRepository } from "./visitWebhookStatusRepository";
 import { VisitRatesRepository } from "./visitRatesRepository";
 import { VisitDialogMessagesRepository } from "./visitDialogMessagesRepository";
+import { VisitFeedbacksRepository } from "./visitFeedbackRepository";
 
 class Repositories {
   private static pool: mysql.Pool;
@@ -13,6 +14,7 @@ class Repositories {
   readonly visitWebhookStatusesRepository: VisitWebhookStatusesRepository;
   readonly visitRatesRepository: VisitRatesRepository;
   readonly visitDialogMessagesRepository: VisitDialogMessagesRepository;
+  readonly visitFeedbacksRepository: VisitFeedbacksRepository;
   readonly webhooksRepository: WebhooksRepository;
   readonly connectorsRepository: ConnectorsRepository;
 
@@ -20,6 +22,7 @@ class Repositories {
     this.visitsRepository = new VisitsRepository(connection);
     this.visitRatesRepository = new VisitRatesRepository(connection);
     this.visitDialogMessagesRepository = new VisitDialogMessagesRepository(connection);
+    this.visitFeedbacksRepository = new VisitFeedbacksRepository(connection)
     this.visitWebhookStatusesRepository = new VisitWebhookStatusesRepository(connection);
     this.webhooksRepository = new WebhooksRepository(connection);
     this.connectorsRepository = new ConnectorsRepository();

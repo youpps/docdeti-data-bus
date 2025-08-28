@@ -27,10 +27,7 @@ const processVisitToWebhook = async (repositoriesObj: Repositories, visitWebhook
       headers: { "Content-Type": "application/json" },
     });
 
-    console.log(JSON.stringify(visit));
-
     const json = await res.json();
-    console.log(json);
 
     if (json.status === Status.Success) {
       await repositories.visitWebhookStatusesRepository.update({
@@ -73,20 +70,29 @@ const processProtocolToConnectors = async (repositories: Repositories, visit: IV
 
 const processFeedbackToConnectors = async (repositories: Repositories, visit: IVisit): Promise<void> => {
   try {
-    const visitDialogMessages = await repositories.visitDialogMessagesRepository.getAll({
+    const visitFeedbacks = await repositories.visitFeedbacksRepository.getAll({
       visitId: visit.id,
+      isSent: 0,
     });
 
-    if (!visit.feedbackSummary || !visit.feedbackType || !visitDialogMessages.length) return;
+    await Promise.allSettled(
+      visitFeedbacks.map(async (visitFeedback) => {
+        const visitDialogMessages = await repositories.visitDialogMessagesRepository.getAll({
+          visitFeedbackId: visitFeedback.id,
+        });
 
-    const feedbackSent = await repositories.connectorsRepository.saveFeedback(visit, visitDialogMessages);
+        if (!visitFeedback.summary || !visitFeedback.type || !visitDialogMessages.length) return;
 
-    if (feedbackSent) {
-      await repositories.visitsRepository.update({
-        id: visit.id,
-        isFeedbackSent: 1,
-      });
-    }
+        const feedbackSent = await repositories.connectorsRepository.saveFeedback(visitFeedback, visitDialogMessages);
+
+        if (feedbackSent) {
+          await repositories.visitFeedbacksRepository.update({
+            id: visitFeedback.id,
+            isSent: 1,
+          });
+        }
+      })
+    );
   } catch (error) {
     console.error(`Failed to process feedback for visit ${visit.id}:`, error);
   }

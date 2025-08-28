@@ -3,14 +3,6 @@ enum VisitType {
   Doctor = "doctor",
 }
 
-enum VisitFeedbackType {
-  Positive = "positive",
-  Negative = "negative",
-  Nopurpose = "nopurpose",
-  Warning = "warning",
-  Commercial = "commercial",
-}
-
 interface IVisit {
   id: string;
   parent: string | null;
@@ -26,18 +18,16 @@ interface IVisit {
   specialization: string;
   serviceName: string;
   isLast: 1 | 0;
+  isCancelled: 1 | 0;
 
-  feedbackType: VisitFeedbackType | null;
-  feedbackSummary: string | null;
   protocol: string | null;
-  isFeedbackSent: 1 | 0;
   isProtocolSent: 1 | 0;
   isRateSent: 1 | 0;
 }
 
 type IInitialVisit = Omit<
   IVisit,
-  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent"
+  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent" | "isCancelled"
 >;
 
 const toInitialVisit = (visit: IVisit): IInitialVisit => {
@@ -59,4 +49,4 @@ const toInitialVisit = (visit: IVisit): IInitialVisit => {
   };
 };
 
-export { IInitialVisit, IVisit, toInitialVisit, VisitFeedbackType, VisitType };
+export { IInitialVisit, IVisit, toInitialVisit, VisitType };

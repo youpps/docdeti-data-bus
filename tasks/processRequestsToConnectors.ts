@@ -10,9 +10,7 @@ class ProcessRequestsToConnectors {
   static async launch(repositories: Repositories): Promise<void> {
     try {
       const [feedbackVisits, protocolVisits, rateVisits] = await Promise.all([
-        repositories.visitsRepository.getAll({
-          isFeedbackSent: 0,
-        }),
+        repositories.visitsRepository.getAll({}),
         repositories.visitsRepository.getAll({
           isProtocolSent: 0,
         }),

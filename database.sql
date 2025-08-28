@@ -17,15 +17,24 @@ CREATE TABLE visits (
 	specialization VARCHAR(256) NOT NULL,
 	serviceName VARCHAR(256) NOT NULL,
 
-	feedbackType ENUM("positive", "negative", "nopurpose", "warning", "commercial"),
-	feedbackSummary TEXT,
 	protocol TEXT,
 
-	isFeedbackSent BOOLEAN NOT NULL DEFAULT 0,
 	isProtocolSent BOOLEAN NOT NULL DEFAULT 0,
 	isRateSent BOOLEAN NOT NULL DEFAULT 0,
 
 	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE visits ADD COLUMN isCancelled BOOLEAN NOT NULL DEFAULT 0;
+
+CREATE TABLE visit_feedbacks (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	type  ENUM("positive", "negative", "nopurpose", "warning", "commercial") NOT NULL,
+	summary TEXT NOT NULL,
+	isSent BOOLEAN NOT NULL DEFAULT 0,
+	visitId VARCHAR(256) NOT NULL
+
+	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );
 
 CREATE TABLE visit_rates (
@@ -48,21 +57,24 @@ CREATE TABLE visit_rates (
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );
 
+DROP TABLE visit_dialog_messages;
+
 CREATE TABLE visit_dialog_messages (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 
 	text TEXT NOT NULL,
 	sender ENUM("bot", "user") NOT NULL,
 
-	visitId VARCHAR(256) NOT NULL,
+	visitFeedbackId INT NOT NULL,
 
-	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
+	FOREIGN KEY (visitFeedbackId) REFERENCES visit_feedbacks(id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE webhooks (
 	url VARCHAR(256) PRIMARY KEY NOT NULL
 );
+
 
 CREATE TABLE visit_webhook_status (
   id INT PRIMARY KEY AUTO_INCREMENT,

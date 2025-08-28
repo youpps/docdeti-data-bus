@@ -1,11 +1,12 @@
 import { IVisit } from "../../types/visit";
 import { IVisitDialogMessage } from "../../types/visitDialogMessage";
+import { IVisitFeedback } from "../../types/visitFeedback";
 import { IVisitRate } from "../../types/visitRate";
 
 class ConnectorsRepository {
   constructor() {}
 
-  async saveFeedback(visit: IVisit, visitDialogMessages: IVisitDialogMessage[]): Promise<boolean> {
+  async saveFeedback(visit: IVisitFeedback, visitDialogMessages: IVisitDialogMessage[]): Promise<boolean> {
     return true;
   }
 

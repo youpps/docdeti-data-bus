@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import { Repositories } from "../repositories";
 import { Status } from "../types/status";
-import { IInitialVisit, VisitFeedbackType, VisitType } from "../types/visit";
-import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
+import { IInitialVisit, VisitType } from "../types/visit";
 import { IVisitDialogMessage, VisitDialogMessageSender } from "../types/visitDialogMessage";
-import { randomInt } from "crypto";
+import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
+import { VisitFeedbackType } from "../types/visitFeedback";
 
 class VisitsController {
   constructor(private repositories: Repositories) {}
@@ -16,8 +16,8 @@ class VisitsController {
     try {
       const visitSchema = Joi.object({
         id: Joi.string().min(1).required(),
-        parent: Joi.string().min(1).required(),
-        child: Joi.string().min(1).required(),
+        parent: Joi.string().allow(null).min(1).required(),
+        child: Joi.string().allow(null).min(1).required(),
         type: Joi.valid(VisitType.Doctor, VisitType.Nurse).required(),
         recordUrl: Joi.string().min(1).required(),
         processedAt: Joi.date().required(),
@@ -75,6 +75,83 @@ class VisitsController {
       });
     } catch (error) {
       console.error("Visit webhook error:", error);
+
+      await rollback();
+
+      return res.status(500).json({
+        status: Status.Error,
+        data: { message: "Internal server error" },
+      });
+    } finally {
+      release();
+    }
+  };
+
+  visitCancel = async (req: Request, res: Response) => {
+    const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
+
+    try {
+      const visitSchema = Joi.object({
+        id: Joi.string().min(1).required(),
+        parent: Joi.string().allow(null).min(1).required(),
+        child: Joi.string().allow(null).min(1).required(),
+        type: Joi.valid(VisitType.Doctor, VisitType.Nurse).required(),
+        recordUrl: Joi.string().allow(null).min(1).required(),
+        processedAt: Joi.date().allow(null).required(),
+        date: Joi.date().required(),
+        phone: Joi.string().min(1).required(),
+        comment: Joi.string().min(1).required(),
+        doctor: Joi.string().min(1).required(),
+        address: Joi.string().min(1).required(),
+        specialization: Joi.string().min(1).required(),
+        serviceName: Joi.string().min(1).required(),
+        isLast: Joi.valid(1, 0).required(),
+      });
+
+      const { error: validationError, value: visitData } = visitSchema.validate(req.body);
+      if (validationError) {
+        return res.status(400).json({
+          status: Status.Error,
+          data: { message: validationError.message },
+        });
+      }
+
+      const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id, isCancelled: 0 });
+      if (existingVisit) {
+        return res.status(400).json({
+          status: Status.Error,
+          data: { message: "Visit is not found or been cancelled" },
+        });
+      }
+
+      const [webhooks] = await Promise.all([
+        repositories.webhooksRepository.getAll(),
+        repositories.visitsRepository.create(visitData),
+      ]);
+
+      const visitWebhookStatusIds = await Promise.all(
+        webhooks.map((webhook) =>
+          repositories.visitWebhookStatusesRepository.create({
+            webhookUrl: webhook.url,
+            visitId: visitData.id,
+          })
+        )
+      );
+
+      await commit();
+
+      const visitWebhookStatuses = (await Promise.all(
+        visitWebhookStatusIds.map((id) => this.repositories.visitWebhookStatusesRepository.getOne({ id }))
+      )) as IVisitWebhookStatus[];
+
+      await Promise.allSettled(visitWebhookStatuses.map((status) => processVisitToWebhook(this.repositories, status)));
+
+      return res.status(200).json({
+        status: Status.Success,
+        data: { message: "Visit has been successfully handled" },
+      });
+    } catch (error) {
+      console.log("Visit webhook error:", error);
 
       await rollback();
 
@@ -288,30 +365,46 @@ class VisitsController {
         });
       }
 
-      if (visit.isFeedbackSent || visit.feedbackSummary || visit.feedbackType) {
-        return res.status(400).json({
-          status: Status.Error,
-          data: { message: "Feedback has already been sent" },
-        });
-      }
-
       const dialog: Pick<IVisitDialogMessage, "sender" | "text">[] = body.dialog;
 
       const { repositories, release, rollback, commit } = await this.repositories.getTransactionalRepositories();
 
       try {
-        await repositories.visitsRepository.update({
-          id: visit.id,
-          feedbackSummary: body.summary,
-          feedbackType: body.type,
+        const visitFeedbackId = await repositories.visitFeedbacksRepository.create({
+          type: body.type,
+          summary: body.summary,
+          visitId: visit.id,
         });
 
         for (let dialogMessage of dialog) {
           await repositories.visitDialogMessagesRepository.create({
             sender: dialogMessage.sender,
             text: dialogMessage.text,
-            visitId: visit.id,
+            visitFeedbackId: visitFeedbackId,
           });
+        }
+
+        const [newVisitFeedback, newVisitDialogMessages] = await Promise.all([
+          repositories.visitFeedbacksRepository.getOne({
+            id: visitFeedbackId,
+          }),
+          repositories.visitDialogMessagesRepository.getAll({
+            visitFeedbackId,
+          }),
+        ]);
+
+        if (newVisitFeedback && newVisitDialogMessages.length) {
+          this.repositories.connectorsRepository
+            .saveFeedback(newVisitFeedback, newVisitDialogMessages)
+            .then((isOk) => {
+              if (!isOk) return;
+
+              this.repositories.visitFeedbacksRepository.update({
+                id: visitFeedbackId,
+                isSent: 1,
+              });
+            })
+            .catch(console.error);
         }
 
         await commit();
@@ -321,29 +414,6 @@ class VisitsController {
         await rollback();
       } finally {
         release();
-      }
-
-      const [newVisit, newVisitDialogMessages] = await Promise.all([
-        repositories.visitsRepository.getOne({
-          id: visit.id,
-        }),
-        repositories.visitDialogMessagesRepository.getAll({
-          visitId: visit.id,
-        }),
-      ]);
-
-      if (newVisit && newVisitDialogMessages.length) {
-        this.repositories.connectorsRepository
-          .saveFeedback(newVisit, newVisitDialogMessages)
-          .then((isOk) => {
-            if (!isOk) return;
-
-            this.repositories.visitsRepository.update({
-              id: visit.id,
-              isFeedbackSent: 1,
-            });
-          })
-          .catch(console.error);
       }
 
       return res.status(200).json({
@@ -389,6 +459,7 @@ class VisitsController {
       });
 
       const json = await response.json();
+
       if (json.status === Status.Error) return res.status(500).json(json);
 
       res.status(200).json(testVisit);
