@@ -441,8 +441,8 @@ class VisitsController {
         const v = c === "x" ? r : (r & 0x3) | 0x8;
         return v.toString(16);
       }),
-      parent: "Сергей Юрьевич",
-      child: "Алексей Павлов",
+      parent: "Ольга Смирнова",
+      child: "Дарья Смирнова",
       type: VisitType.Doctor,
       recordUrl: "test-record",
       processedAt: new Date("2025-07-31T14:30:00Z"),
