@@ -32,7 +32,7 @@ CREATE TABLE visit_feedbacks (
 	type  ENUM("positive", "negative", "nopurpose", "warning", "commercial") NOT NULL,
 	summary TEXT NOT NULL,
 	isSent BOOLEAN NOT NULL DEFAULT 0,
-	visitId VARCHAR(256) NOT NULL
+	visitId VARCHAR(256) NOT NULL,
 
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );

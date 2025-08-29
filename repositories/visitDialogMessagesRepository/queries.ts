@@ -6,11 +6,11 @@ const getVisitDialogMessagesQuery = (visit: Partial<IVisitDialogMessage>) => {
 
   const query = keys.length ? `WHERE ` + keys.map((key) => `${key} = :${key} `).join(" AND ") : "";
 
-  return `SELECT id, text, sender, visitId FROM visit_dialog_messages ${query};`;
+  return `SELECT id, text, sender, visitFeedbackId FROM visit_dialog_messages ${query};`;
 };
 
 const createVisitDialogMessageQuery = () => {
-  return `INSERT INTO visit_dialog_messages(text, sender, visitId) VALUES(:text, :sender, :visitId);`;
+  return `INSERT INTO visit_dialog_messages(text, sender, visitFeedbackId) VALUES(:text, :sender, :visitFeedbackId);`;
 };
 
 const updateVisitDialogMessageQuery = (visitDialogMessage: { id: number } & Partial<IVisitDialogMessage>) => {

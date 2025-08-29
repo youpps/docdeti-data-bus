@@ -412,6 +412,11 @@ class VisitsController {
         console.log(error);
 
         await rollback();
+
+        return res.status(500).json({
+          status: Status.Success,
+          data: { message: "Internal server error" },
+        });
       } finally {
         release();
       }
