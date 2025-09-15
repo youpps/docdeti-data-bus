@@ -13,8 +13,12 @@ class ConnectorsRepository {
     visitDialogMessages: IVisitDialogMessage[]
   ): Promise<boolean> {
     try {
+      console.log(visitFeedback);
+
       switch (visitFeedback.type) {
         case VisitFeedbackType.Positive: {
+          console.log(process.env.GOOGLE_DOCS_CONNECTOR_URL + "/api/feedback");
+
           const res = await fetch(process.env.GOOGLE_DOCS_CONNECTOR_URL + "/api/feedback", {
             method: "POST",
             body: JSON.stringify({
@@ -38,6 +42,8 @@ class ConnectorsRepository {
         }
 
         case VisitFeedbackType.Negative: {
+          console.log(process.env.ONE_FORMA_CONNECTOR_URL + "/api/feedback");
+
           const res = await fetch(process.env.ONE_FORMA_CONNECTOR_URL + "/api/feedback", {
             method: "POST",
             body: JSON.stringify({
