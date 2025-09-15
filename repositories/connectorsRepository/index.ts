@@ -13,6 +13,8 @@ class ConnectorsRepository {
     visitDialogMessages: IVisitDialogMessage[]
   ): Promise<boolean> {
     try {
+      const correctDialog = visitDialogMessages.map(({ sender, text }) => ({ sender, text }));
+
       switch (visitFeedback.type) {
         case VisitFeedbackType.Positive: {
           const res = await fetch(process.env.GOOGLE_DOCS_CONNECTOR_URL + "/api/feedback", {
@@ -23,7 +25,7 @@ class ConnectorsRepository {
             body: JSON.stringify({
               type: visitFeedback.type,
               summary: visitFeedback.summary,
-              dialog: visitDialogMessages,
+              dialog: correctDialog,
               patient: visit.child || visit.parent,
               phone: visit.phone,
               date: visit.date,
@@ -39,8 +41,6 @@ class ConnectorsRepository {
         }
 
         case VisitFeedbackType.Negative: {
-          console.log(process.env.ONE_FORMA_CONNECTOR_URL + "/api/feedback");
-
           const res = await fetch(process.env.ONE_FORMA_CONNECTOR_URL + "/api/feedback", {
             method: "POST",
             headers: {
@@ -49,7 +49,7 @@ class ConnectorsRepository {
             body: JSON.stringify({
               type: visitFeedback.type,
               summary: visitFeedback.summary,
-              dialog: visitDialogMessages,
+              dialog: correctDialog,
               fullname: visit.child || visit.parent,
               phone: visit.phone,
               date: visit.date,
