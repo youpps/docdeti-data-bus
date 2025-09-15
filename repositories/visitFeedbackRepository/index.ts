@@ -7,13 +7,13 @@ class VisitFeedbacksRepository {
 
   async getAll(visitFeedback: Partial<IVisitFeedback>): Promise<IVisitFeedback[]> {
     const [data]: any = await this.db.query(getVisitFeedbacksQuery(visitFeedback), visitFeedback);
-    console.log(data, getVisitFeedbacksQuery(visitFeedback));
 
     return data;
   }
 
   async getOne(visitFeedback: Partial<IVisitFeedback>): Promise<IVisitFeedback | null> {
     const [data]: any = await this.getAll(visitFeedback);
+    console.log(data[0]);
 
     return data[0] ?? null;
   }
