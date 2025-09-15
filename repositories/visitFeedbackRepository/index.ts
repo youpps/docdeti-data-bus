@@ -12,10 +12,9 @@ class VisitFeedbacksRepository {
   }
 
   async getOne(visitFeedback: Partial<IVisitFeedback>): Promise<IVisitFeedback | null> {
-    const [data]: any = await this.getAll(visitFeedback);
-    console.log(data[0]);
+    const visitFeedbacks = await this.getAll(visitFeedback);
 
-    return data[0] ?? null;
+    return visitFeedbacks[0] ?? null;
   }
 
   async create(visitFeedback: Omit<IVisitFeedback, "id" | "isSent">): Promise<number> {
