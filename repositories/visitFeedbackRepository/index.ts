@@ -7,6 +7,7 @@ class VisitFeedbacksRepository {
 
   async getAll(visitFeedback: Partial<IVisitFeedback>): Promise<IVisitFeedback[]> {
     const [data]: any = await this.db.query(getVisitFeedbacksQuery(visitFeedback), visitFeedback);
+    console.log(data, getVisitFeedbacksQuery(visitFeedback));
 
     return data;
   }
