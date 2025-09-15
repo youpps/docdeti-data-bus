@@ -83,7 +83,11 @@ const processFeedbackToConnectors = async (repositories: Repositories, visit: IV
 
         if (!visitFeedback.summary || !visitFeedback.type || !visitDialogMessages.length) return;
 
-        const feedbackSent = await repositories.connectorsRepository.saveFeedback(visitFeedback, visitDialogMessages);
+        const feedbackSent = await repositories.connectorsRepository.saveFeedback(
+          visit,
+          visitFeedback,
+          visitDialogMessages
+        );
 
         if (feedbackSent) {
           await repositories.visitFeedbacksRepository.update({

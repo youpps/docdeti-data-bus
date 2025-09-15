@@ -32,6 +32,8 @@ class ConnectorsRepository {
 
           const json = await res.json();
 
+          console.log(json);
+
           return json.status === Status.Success;
         }
 
@@ -49,6 +51,8 @@ class ConnectorsRepository {
           });
 
           const json = await res.json();
+
+          console.log(json);
 
           return json.status === Status.Success;
         }

@@ -395,7 +395,7 @@ class VisitsController {
 
         if (newVisitFeedback && newVisitDialogMessages.length) {
           this.repositories.connectorsRepository
-            .saveFeedback(newVisitFeedback, newVisitDialogMessages)
+            .saveFeedback(visit, newVisitFeedback, newVisitDialogMessages)
             .then((isOk) => {
               if (!isOk) return;
 
