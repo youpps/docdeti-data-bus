@@ -393,6 +393,8 @@ class VisitsController {
           }),
         ]);
 
+        console.log(newVisitFeedback, newVisitDialogMessages.length);
+
         if (newVisitFeedback && newVisitDialogMessages.length) {
           this.repositories.connectorsRepository
             .saveFeedback(visit, newVisitFeedback, newVisitDialogMessages)
