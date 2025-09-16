@@ -4,6 +4,7 @@ enum VisitFeedbackType {
   Nopurpose = "nopurpose",
   Warning = "warning",
   Commercial = "commercial",
+  Callback = "callback",
 }
 
 interface IVisitFeedback {

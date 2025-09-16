@@ -58,9 +58,33 @@ class ConnectorsRepository {
 
           const json = await res.json();
 
-          console.log(json);
+          return json.status === Status.Success;
+        }
+        case VisitFeedbackType.Commercial:
+        case VisitFeedbackType.Warning:
+        case VisitFeedbackType.Callback: {
+          const res = await fetch(process.env.AMO_CONNECTOR_URL + "/api/feedback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: visitFeedback.type,
+              summary: visitFeedback.summary,
+              dialog: correctDialog,
+              phone: visit.phone,
+              date: visit.date,
+              fullname: visit.child || visit.parent,
+            }),
+          });
+
+          const json = await res.json();
 
           return json.status === Status.Success;
+        }
+
+        case VisitFeedbackType.Nopurpose: {
+          break;
         }
       }
 
