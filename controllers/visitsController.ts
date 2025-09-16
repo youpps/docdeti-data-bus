@@ -341,7 +341,8 @@ class VisitsController {
           VisitFeedbackType.Negative,
           VisitFeedbackType.Nopurpose,
           VisitFeedbackType.Positive,
-          VisitFeedbackType.Warning
+          VisitFeedbackType.Warning,
+          VisitFeedbackType.Callback
         ).required(),
         summary: Joi.string().min(1).required(),
         dialog: Joi.array().min(1).items(dialogSchema),
