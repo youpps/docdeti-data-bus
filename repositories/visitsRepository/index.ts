@@ -18,7 +18,7 @@ class VisitsRepository {
   };
 
   create = async (visit: IInitialVisit) => {
-    await this.db.query(createVisitQuery(), {
+    let correctVisit = {
       ...visit,
       parentName: visit.parent.name,
       parentSurname: visit.parent.surname,
@@ -30,7 +30,12 @@ class VisitsRepository {
       childPatronymic: visit.child?.patronymic ?? null,
       childSex: visit.child?.sex ?? null,
       childAge: visit.child?.age ?? null,
-    });
+    };
+
+    delete (correctVisit as any)["parent"];
+    delete (correctVisit as any)["child"];
+
+    await this.db.query(createVisitQuery(), correctVisit);
   };
 
   update = async (visit: { id: string } & Partial<IVisit>) => {
