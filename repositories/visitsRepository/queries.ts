@@ -5,7 +5,16 @@ const getVisitsQuery = (visit: Partial<IVisit>) => {
 
   const query = keys.length ? `WHERE ` + keys.map((key) => `${key} = :${key} `).join(" AND ") : "";
 
-  return `SELECT id, parent, child, type, recordUrl, processedAt, date, phone, comment, doctor, address, isLast, specialization, serviceName FROM visits ${query};`;
+  return `SELECT id, parentName,
+    parentSurname,
+    parentPatronymic,
+    parentSex,
+    parentAge,    
+    childName,
+    childSurname,
+    childPatronymic,
+    childSex,
+    childAge, type, recordUrl, processedAt, date, phone, comment, doctor, address, isLast, specialization, serviceName FROM visits ${query};`;
 };
 
 const createVisitQuery = () => {
