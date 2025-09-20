@@ -48,6 +48,8 @@ class VisitsController {
         });
       }
 
+      console.log(visitData, req.body);
+
       const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id });
       if (existingVisit) {
         return res.status(400).json({
