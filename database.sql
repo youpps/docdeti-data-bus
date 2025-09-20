@@ -2,8 +2,18 @@ CREATE DATABASE docdeti CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE visits (
 	id VARCHAR(256) PRIMARY KEY NOT NULL,
-	parent VARCHAR(256) NOT NULL,
-	child VARCHAR(256) NOT NULL,
+	parentName VARCHAR(256) NOT NULL,
+	parentSurname VARCHAR(256) NOT NULL,
+	parentPatronymic VARCHAR(256) NOT NULL,
+	parentSex ENUM("male", "female") NOT NULL,
+	parentAge INT NOT NULL,
+
+	childName VARCHAR(256),
+	childSurname VARCHAR(256),
+	childPatronymic VARCHAR(256),
+	childSex ENUM("male", "female"),
+	childAge INT,
+
 	type ENUM("nurse", "doctor") NOT NULL, 
 	recordUrl VARCHAR(256) NOT NULL,
 	processedAt TIMESTAMP NOT NULL,
@@ -25,33 +35,42 @@ CREATE TABLE visits (
 	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE visits ADD COLUMN isCancelled BOOLEAN NOT NULL DEFAULT 0;
-
 CREATE TABLE visit_feedbacks (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	type  ENUM("positive", "negative", "nopurpose", "warning", "commercial") NOT NULL,
 	summary TEXT NOT NULL,
 	isSent BOOLEAN NOT NULL DEFAULT 0,
 	visitId VARCHAR(256) NOT NULL,
+	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
 );
 
+ALTER TABLE visit_feedbacks MODIFY COLUMN type ENUM("positive", "negative", "nopurpose", "warning", "commercial", "callback") NOT NULL;
+
 CREATE TABLE visit_rates (
  	id INT PRIMARY KEY AUTO_INCREMENT,
 
-	didDoctorIntroduceThemselves INT,
-	didDoctorGreetPatient INT,
-	didDoctorUseOpenQuestion INT,
+	 -- Закрытые (да/нет) вопросы
+    didDoctorIntroduceThemselves INT NOT NULL,
+    didDoctorGreetPatient INT NOT NULL,
+    didDoctorIdentifyPatient INT NOT NULL,
+    didDoctorUseOpenQuestion INT NOT NULL,
+    didDoctorSummarizePatientInfo INT NOT NULL,
+    didDoctorClarifyAgenda INT NOT NULL,
+    didDoctorInterruptPatient INT NOT NULL,
+    didDoctorAskClarifyingQuestions INT NOT NULL,
+    didDoctorCheckPatientUnderstanding INT NOT NULL,
+    didDoctorExplainNextSteps INT NOT NULL,
+    didDoctorExplainWhereToFindReport INT NOT NULL,
+    wasDoctorEmpathetic INT NOT NULL,
 
-	didDoctorCommentOnObservations INT,
-	didDoctorExplainResultInterpreterAndSpecialty INT,
-	didDoctorExplainWhereToFindReport INT,
-
-	wasDoctorEmpathetic INT,
-	patientNegativeExperienceSummary TEXT,
-	referralToAnotherClinicSummary TEXT,
+    -- Открытые (текстовые) вопросы
+    referralToThisClinicSummary TEXT,
+    referralToAnotherClinicSummary TEXT
 	
+	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
 	visitId VARCHAR(256) NOT NULL,
 
 	FOREIGN KEY (visitId) REFERENCES visits(id) ON DELETE CASCADE
@@ -66,13 +85,16 @@ CREATE TABLE visit_dialog_messages (
 	sender ENUM("bot", "user") NOT NULL,
 
 	visitFeedbackId INT NOT NULL,
+	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	FOREIGN KEY (visitFeedbackId) REFERENCES visit_feedbacks(id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE webhooks (
-	url VARCHAR(256) PRIMARY KEY NOT NULL
+	url VARCHAR(256) PRIMARY KEY NOT NULL,
+	type ENUM("newVisit", "cancelledVisit") NOT NULL,
+	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -89,3 +111,9 @@ CREATE TABLE visit_webhook_status (
   FOREIGN KEY (visitId) REFERENCES visits(id),
   FOREIGN KEY (webhookUrl) REFERENCES webhooks(url)
 );
+
+DROP TABLE visit_webhook_status;
+DROP TABLE visit_dialog_messages;
+DROP TABLE visit_rates;
+DROP TABLE visit_feedbacks;
+DROP TABLE visits;

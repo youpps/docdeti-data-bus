@@ -1,5 +1,11 @@
-interface IWebhook {
-  url: string;
+enum WebhookType {
+  NewVisit = "newVisit",
+  CancelledVisit = "cancelledVisit",
 }
 
-export { IWebhook };
+interface IWebhook {
+  url: string;
+  type: WebhookType;
+}
+
+export { IWebhook, WebhookType };

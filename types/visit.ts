@@ -3,10 +3,23 @@ enum VisitType {
   Doctor = "doctor",
 }
 
+enum VisitClientSex {
+  Male = "male",
+  Female = "female",
+}
+
+interface IVisitClient {
+  name: string;
+  surname: string;
+  patronymic: string;
+  sex: VisitClientSex;
+  age: number;
+}
+
 interface IVisit {
   id: string;
-  parent: string | null;
-  child: string | null;
+  parent: IVisitClient;
+  child: IVisitClient | null;
   type: VisitType;
   recordUrl: string;
   processedAt: Date;
@@ -49,4 +62,4 @@ const toInitialVisit = (visit: IVisit): IInitialVisit => {
   };
 };
 
-export { IInitialVisit, IVisit, toInitialVisit, VisitType };
+export { IInitialVisit, IVisit, toInitialVisit, VisitType, IVisitClient, VisitClientSex };

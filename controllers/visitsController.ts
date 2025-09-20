@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import { Repositories } from "../repositories";
 import { Status } from "../types/status";
-import { IInitialVisit, VisitType } from "../types/visit";
+import { IInitialVisit, VisitClientSex, VisitType } from "../types/visit";
 import { IVisitDialogMessage, VisitDialogMessageSender } from "../types/visitDialogMessage";
 import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
 import { VisitFeedbackType } from "../types/visitFeedback";
+import { WebhookType } from "../types/webhook";
 
 class VisitsController {
   constructor(private repositories: Repositories) {}
@@ -14,10 +15,18 @@ class VisitsController {
     const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
 
     try {
+      const client = Joi.object({
+        name: Joi.string().min(1).required(),
+        surname: Joi.string().min(1).required(),
+        patronymic: Joi.string().min(1).required(),
+        sex: Joi.valid(VisitClientSex.Female, VisitClientSex.Male).required(),
+        age: Joi.number().required(),
+      });
+
       const visitSchema = Joi.object({
         id: Joi.string().min(1).required(),
-        parent: Joi.string().allow(null).min(1).required(),
-        child: Joi.string().allow(null).min(1).required(),
+        parent: client.required(),
+        child: client.allow(null).required(),
         type: Joi.valid(VisitType.Doctor, VisitType.Nurse).required(),
         recordUrl: Joi.string().min(1).required(),
         processedAt: Joi.date().required(),
@@ -48,7 +57,9 @@ class VisitsController {
       }
 
       const [webhooks] = await Promise.all([
-        repositories.webhooksRepository.getAll(),
+        repositories.webhooksRepository.getAll({
+          type: WebhookType.NewVisit,
+        }),
         repositories.visitsRepository.create(visitData),
       ]);
 
@@ -74,7 +85,7 @@ class VisitsController {
         data: { message: "Visit has been successfully handled" },
       });
     } catch (error) {
-      console.error("Visit webhook error:", error);
+      console.log("Visit webhook error:", error);
 
       await rollback();
 
@@ -91,10 +102,18 @@ class VisitsController {
     const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
 
     try {
+      const client = Joi.object({
+        name: Joi.string().min(1).required(),
+        surname: Joi.string().min(1).required(),
+        patronymic: Joi.string().min(1).required(),
+        sex: Joi.valid(VisitClientSex.Female, VisitClientSex.Male).required(),
+        age: Joi.number().required(),
+      });
+
       const visitSchema = Joi.object({
         id: Joi.string().min(1).required(),
-        parent: Joi.string().allow(null).min(1).required(),
-        child: Joi.string().allow(null).min(1).required(),
+        parent: client.required(),
+        child: client.allow(null).required(),
         type: Joi.valid(VisitType.Doctor, VisitType.Nurse).required(),
         recordUrl: Joi.string().allow(null).min(1).required(),
         processedAt: Joi.date().allow(null).required(),
@@ -116,24 +135,23 @@ class VisitsController {
         });
       }
 
-      const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id, isCancelled: 0 });
-      if (existingVisit) {
+      const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id });
+      if (!existingVisit) {
         return res.status(400).json({
           status: Status.Error,
-          data: { message: "Visit is not found or been cancelled" },
+          data: { message: "Visit is not found" },
         });
       }
 
-      const [webhooks] = await Promise.all([
-        repositories.webhooksRepository.getAll(),
-        repositories.visitsRepository.create(visitData),
-      ]);
+      const webhooks = await repositories.webhooksRepository.getAll({
+        type: WebhookType.CancelledVisit,
+      });
 
       const visitWebhookStatusIds = await Promise.all(
         webhooks.map((webhook) =>
           repositories.visitWebhookStatusesRepository.create({
             webhookUrl: webhook.url,
-            visitId: visitData.id,
+            visitId: existingVisit.id,
           })
         )
       );
@@ -209,14 +227,14 @@ class VisitsController {
             isProtocolSent: 1,
           });
         })
-        .catch(console.error);
+        .catch(console.log);
 
       return res.status(200).json({
         status: Status.Success,
         data: { message: "Protocol has been successfully saved" },
       });
     } catch (error) {
-      console.error("Handle protocol error:", error);
+      console.log("Handle protocol error:", error);
 
       return res.status(500).json({
         status: Status.Error,
@@ -281,15 +299,20 @@ class VisitsController {
       }
 
       await repositories.visitRatesRepository.create({
-        didDoctorCommentOnObservations: body.didDoctorCommentOnObservations,
-        didDoctorExplainResultInterpreterAndSpecialty: body.didDoctorExplainResultInterpreterAndSpecialty,
-        didDoctorExplainWhereToFindReport: body.didDoctorExplainWhereToFindReport,
-        didDoctorGreetPatient: body.didDoctorGreetPatient,
         didDoctorIntroduceThemselves: body.didDoctorIntroduceThemselves,
+        didDoctorGreetPatient: body.didDoctorGreetPatient,
+        didDoctorIdentifyPatient: body.didDoctorIdentifyPatient,
         didDoctorUseOpenQuestion: body.didDoctorUseOpenQuestion,
+        didDoctorSummarizePatientInfo: body.didDoctorSummarizePatientInfo,
+        didDoctorClarifyAgenda: body.didDoctorClarifyAgenda,
+        didDoctorInterruptPatient: body.didDoctorInterruptPatient,
+        didDoctorAskClarifyingQuestions: body.didDoctorAskClarifyingQuestions,
+        didDoctorCheckPatientUnderstanding: body.didDoctorCheckPatientUnderstanding,
+        didDoctorExplainNextSteps: body.didDoctorExplainNextSteps,
+        didDoctorExplainWhereToFindReport: body.didDoctorExplainWhereToFindReport,
         wasDoctorEmpathetic: body.wasDoctorEmpathetic,
-        patientNegativeExperienceSummary: body.patientNegativeExperienceSummary,
-        referralToAnotherClinicSummary: body.referralToAnotherClinicSummary,
+        referralToAnotherClinicSummary: body.referralToThisClinicSummary,
+        referralToThisClinicSummary: body.referralToThisClinicSummary,
         visitId: visit.id,
       });
 
@@ -306,14 +329,14 @@ class VisitsController {
             isRateSent: 1,
           });
         })
-        .catch(console.error);
+        .catch(console.log);
 
       return res.status(200).json({
         status: Status.Success,
         data: { message: "Rate has been successfully saved" },
       });
     } catch (error) {
-      console.error("Handle rate error:", error);
+      console.log("Handle rate error:", error);
 
       await rollback();
 
@@ -405,17 +428,17 @@ class VisitsController {
                 isSent: 1,
               });
             })
-            .catch(console.error);
+            .catch(console.log);
         }
 
         await commit();
-      } catch (error) {
-        console.log(error);
+      } catch (e) {
+        console.log(e);
 
         await rollback();
 
         return res.status(500).json({
-          status: Status.Success,
+          status: Status.Error,
           data: { message: "Internal server error" },
         });
       } finally {
@@ -427,7 +450,7 @@ class VisitsController {
         data: { message: "Feedback has been successfully saved" },
       });
     } catch (error) {
-      console.error("Handle feedback error:", error);
+      console.log("Handle feedback error:", error);
       return res.status(500).json({
         status: Status.Error,
         data: { message: "Internal server error" },
@@ -442,8 +465,20 @@ class VisitsController {
         const v = c === "x" ? r : (r & 0x3) | 0x8;
         return v.toString(16);
       }),
-      parent: "Ольга Смирнова",
-      child: "Дарья Смирнова",
+      parent: {
+        name: "Ольга",
+        surname: "Смирнова",
+        patronymic: "Александровна",
+        sex: VisitClientSex.Female,
+        age: 35,
+      },
+      child: {
+        name: "Алексей",
+        surname: "Смирнов",
+        patronymic: "Павлович",
+        sex: VisitClientSex.Female,
+        age: 6,
+      },
       type: VisitType.Doctor,
       recordUrl: "test-record",
       processedAt: new Date("2025-07-31T14:30:00Z"),
@@ -470,7 +505,7 @@ class VisitsController {
 
       res.status(200).json(testVisit);
     } catch (error) {
-      console.error("Fake visit error:", error);
+      console.log("Fake visit error:", error);
       res.status(500).json({
         status: Status.Error,
         data: { message: "Failed to create fake visit" },

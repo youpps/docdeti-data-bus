@@ -5,8 +5,8 @@ import { IWebhook } from "../../types/webhook";
 class WebhooksRepository {
   constructor(private db: mysql.Pool | mysql.Connection) {}
 
-  async getAll(): Promise<IWebhook[]> {
-    const [data]: any = await this.db.query(getWebhooksQuery());
+  async getAll(webhook: Partial<IWebhook>): Promise<IWebhook[]> {
+    const [data]: any = await this.db.query(getWebhooksQuery(webhook), webhook);
 
     return data;
   }

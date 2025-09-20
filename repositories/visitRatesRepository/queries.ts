@@ -5,33 +5,57 @@ const getVisitRatesQuery = (visit: Partial<IVisitRate>) => {
 
   const query = keys.length ? `WHERE ` + keys.map((key) => `${key} = :${key} `).join(" AND ") : "";
 
-  return `SELECT id, didDoctorIntroduceThemselves, didDoctorGreetPatient, didDoctorUseOpenQuestion, didDoctorCommentOnObservations, didDoctorExplainResultInterpreterAndSpecialty, didDoctorExplainWhereToFindReport, wasDoctorEmpathetic, patientNegativeExperienceSummary, referralToAnotherClinicSummary, visitId FROM visit_rates ${query};`;
+  return `SELECT id, visitId,
+   didDoctorIntroduceThemselves,
+   didDoctorGreetPatient,
+   didDoctorIdentifyPatient,
+   didDoctorUseOpenQuestion,
+   didDoctorSummarizePatientInfo,
+   didDoctorClarifyAgenda,
+   didDoctorInterruptPatient,
+   didDoctorAskClarifyingQuestions,
+   didDoctorCheckPatientUnderstanding,
+   didDoctorExplainNextSteps,
+   didDoctorExplainWhereToFindReport,
+   wasDoctorEmpathetic,
+   referralToThisClinicSummary,
+   referralToAnotherClinicSummary FROM visit_rates ${query};`;
 };
 
 const createVisitRateQuery = () => {
   return `INSERT INTO visit_rates(
     visitId,
-    didDoctorIntroduceThemselves, 
-    didDoctorGreetPatient, 
-    didDoctorUseOpenQuestion, 
-    didDoctorCommentOnObservations, 
-    didDoctorExplainResultInterpreterAndSpecialty, 
-    didDoctorExplainWhereToFindReport, 
-    wasDoctorEmpathetic, 
-    patientNegativeExperienceSummary, 
-    referralToAnotherClinicSummary
+   didDoctorIntroduceThemselves,
+   didDoctorGreetPatient,
+   didDoctorIdentifyPatient,
+   didDoctorUseOpenQuestion,
+   didDoctorSummarizePatientInfo,
+   didDoctorClarifyAgenda,
+   didDoctorInterruptPatient,
+   didDoctorAskClarifyingQuestions,
+   didDoctorCheckPatientUnderstanding,
+   didDoctorExplainNextSteps,
+   didDoctorExplainWhereToFindReport,
+   wasDoctorEmpathetic,
+   referralToThisClinicSummary,
+   referralToAnotherClinicSummary
   ) 
   VALUES(
-    :visitId,
-    :didDoctorIntroduceThemselves, 
-    :didDoctorGreetPatient, 
-    :didDoctorUseOpenQuestion, 
-    :didDoctorCommentOnObservations, 
-    :didDoctorExplainResultInterpreterAndSpecialty, 
-    :didDoctorExplainWhereToFindReport, 
-    :wasDoctorEmpathetic, 
-    :patientNegativeExperienceSummary, 
-    :referralToAnotherClinicSummary
+      :visitId,
+   :didDoctorIntroduceThemselves,
+   :didDoctorGreetPatient,
+   :didDoctorIdentifyPatient,
+   :didDoctorUseOpenQuestion,
+   :didDoctorSummarizePatientInfo,
+   :didDoctorClarifyAgenda,
+   :didDoctorInterruptPatient,
+   :didDoctorAskClarifyingQuestions,
+   :didDoctorCheckPatientUnderstanding,
+   :didDoctorExplainNextSteps,
+   :didDoctorExplainWhereToFindReport,
+   :wasDoctorEmpathetic,
+   :referralToThisClinicSummary,
+   :referralToAnotherClinicSummary
   )`;
 };
 

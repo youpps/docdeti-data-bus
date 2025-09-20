@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { IInitialVisit, IVisit } from "../../types/visit";
+import { IInitialVisit, IVisit, VisitClientSex } from "../../types/visit";
 import { createVisitQuery, getVisitsQuery, updateVisitQuery } from "./queries";
 
 class VisitsRepository {
@@ -18,7 +18,19 @@ class VisitsRepository {
   };
 
   create = async (visit: IInitialVisit) => {
-    await this.db.query(createVisitQuery(), visit);
+    await this.db.query(createVisitQuery(), {
+      ...visit,
+      parentName: visit.parent.name,
+      parentSurname: visit.parent.surname,
+      parentPatronymic: visit.parent.patronymic,
+      parentSex: visit.parent.sex,
+      parentAge: visit.parent.age,
+      childName: visit.child?.name ?? null,
+      childSurname: visit.child?.surname ?? null,
+      childPatronymic: visit.child?.patronymic ?? null,
+      childSex: visit.child?.sex ?? null,
+      childAge: visit.child?.age ?? null,
+    });
   };
 
   update = async (visit: { id: string } & Partial<IVisit>) => {
