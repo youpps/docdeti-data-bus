@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import { Repositories } from "../repositories";
 import { Status } from "../types/status";
-import { IInitialVisit, VisitClientSex, VisitType } from "../types/visit";
+import { IInitialVisit, IVisitDTO, VisitClientSex, VisitType } from "../types/visit";
 import { IVisitDialogMessage, VisitDialogMessageSender } from "../types/visitDialogMessage";
 import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
 import { VisitFeedbackType } from "../types/visitFeedback";
@@ -459,7 +459,7 @@ class VisitsController {
   };
 
   fakeVisit = async (req: Request, res: Response) => {
-    const testVisit: IInitialVisit = {
+    const testVisit: IVisitDTO = {
       id: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
         const r = (Math.random() * 16) | 0;
         const v = c === "x" ? r : (r & 0x3) | 0x8;

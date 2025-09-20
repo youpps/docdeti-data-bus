@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { IInitialVisit, IVisit, VisitClientSex } from "../../types/visit";
+import { IInitialVisit, IVisit, IVisitDTO } from "../../types/visit";
 import { createVisitQuery, getVisitsQuery, updateVisitQuery } from "./queries";
 
 class VisitsRepository {
@@ -17,8 +17,8 @@ class VisitsRepository {
     return visits[0] ?? null;
   };
 
-  create = async (visit: IInitialVisit) => {
-    let correctVisit = {
+  create = async (visit: IVisitDTO) => {
+    let correctVisit: IInitialVisit = {
       ...visit,
       parentName: visit.parent.name,
       parentSurname: visit.parent.surname,

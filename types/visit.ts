@@ -18,8 +18,18 @@ interface IVisitClient {
 
 interface IVisit {
   id: string;
-  parent: IVisitClient;
-  child: IVisitClient | null;
+  parentName: string;
+  parentSurname: string;
+  parentPatronymic: string;
+  parentSex: VisitClientSex;
+  parentAge: number;
+
+  childName: string | null;
+  childSurname: string | null;
+  childPatronymic: string | null;
+  childSex: VisitClientSex | null;
+  childAge: number | null;
+
   type: VisitType;
   recordUrl: string;
   processedAt: Date;
@@ -31,7 +41,6 @@ interface IVisit {
   specialization: string;
   serviceName: string;
   isLast: 1 | 0;
-  isCancelled: 1 | 0;
 
   protocol: string | null;
   isProtocolSent: 1 | 0;
@@ -40,14 +49,46 @@ interface IVisit {
 
 type IInitialVisit = Omit<
   IVisit,
-  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent" | "isCancelled"
+  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent"
 >;
 
-const toInitialVisit = (visit: IVisit): IInitialVisit => {
+type IVisitDTO = Omit<
+  IInitialVisit,
+  | "parentName"
+  | "parentSurname"
+  | "parentPatronymic"
+  | "parentSex"
+  | "parentAge"
+  | "childName"
+  | "childSurname"
+  | "childPatronymic"
+  | "childSex"
+  | "childAge"
+> & {
+  parent: IVisitClient;
+  child: IVisitClient | null;
+};
+
+const toInitialVisit = (visit: IVisit): IVisitDTO => {
   return {
     id: visit.id,
-    parent: visit.parent,
-    child: visit.child,
+    parent: {
+      name: visit.parentName,
+      surname: visit.parentSurname,
+      patronymic: visit.parentPatronymic,
+      age: visit.parentAge,
+      sex: visit.parentSex,
+    },
+    child:
+      !visit.childName || !visit.childSurname || !visit.childPatronymic || !visit.childAge || !visit.childSex
+        ? null
+        : {
+            name: visit.childName,
+            surname: visit.childSurname,
+            patronymic: visit.childPatronymic,
+            age: visit.childAge,
+            sex: visit.childSex,
+          },
     type: visit.type,
     recordUrl: visit.recordUrl,
     processedAt: visit.processedAt,
@@ -62,4 +103,4 @@ const toInitialVisit = (visit: IVisit): IInitialVisit => {
   };
 };
 
-export { IInitialVisit, IVisit, toInitialVisit, VisitType, IVisitClient, VisitClientSex };
+export { IVisitDTO, IVisit, toInitialVisit, VisitType, IVisitClient, VisitClientSex, IInitialVisit };
