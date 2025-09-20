@@ -14,6 +14,9 @@ class ConnectorsRepository {
   ): Promise<boolean> {
     try {
       const correctDialog = visitDialogMessages.map(({ sender, text }) => ({ sender, text }));
+      const childFullName = [visit.childName, visit.childSurname, visit.childPatronymic].filter(Boolean).join(" ");
+      const parentFullName = [visit.parentName, visit.parentSurname, visit.parentPatronymic].filter(Boolean).join(" ");
+      const fullname = childFullName || parentFullName;
 
       switch (visitFeedback.type) {
         case VisitFeedbackType.Positive: {
@@ -26,7 +29,7 @@ class ConnectorsRepository {
               type: visitFeedback.type,
               summary: visitFeedback.summary,
               dialog: correctDialog,
-              patient: visit.child || visit.parent,
+              patient: fullname,
               phone: visit.phone,
               date: visit.date,
               processedAt: visit.processedAt,
@@ -50,7 +53,7 @@ class ConnectorsRepository {
               type: visitFeedback.type,
               summary: visitFeedback.summary,
               dialog: correctDialog,
-              fullname: visit.child || visit.parent,
+              fullname,
               phone: visit.phone,
               date: visit.date,
             }),
@@ -74,7 +77,7 @@ class ConnectorsRepository {
               dialog: correctDialog,
               phone: visit.phone,
               date: visit.date,
-              fullname: visit.child || visit.parent,
+              fullname,
             }),
           });
 
