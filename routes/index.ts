@@ -8,6 +8,7 @@ function routes(repositories: Repositories) {
 
   // Webhook
   router.post("/visit", controllers.visitsController.visitWebhook);
+  router.post("/visit/cancel", controllers.visitsController.visitCancel);
   router.post("/visit/:visitId/feedback", controllers.visitsController.handleFeedback);
   router.post("/visit/:visitId/protocol", controllers.visitsController.handleProtocol);
   router.post("/visit/:visitId/rate", controllers.visitsController.handleRate);
