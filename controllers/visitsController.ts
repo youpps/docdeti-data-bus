@@ -12,8 +12,6 @@ class VisitsController {
   constructor(private repositories: Repositories) {}
 
   visitWebhook = async (req: Request, res: Response) => {
-    const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
-
     try {
       const client = Joi.object({
         name: Joi.string().min(1).required(),
@@ -48,7 +46,7 @@ class VisitsController {
         });
       }
 
-      const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id });
+      const existingVisit = await this.repositories.visitsRepository.getOne({ id: visitData.id });
       if (existingVisit) {
         return res.status(400).json({
           status: Status.Error,
@@ -56,29 +54,46 @@ class VisitsController {
         });
       }
 
-      const [webhooks] = await Promise.all([
-        repositories.webhooksRepository.getAll({
-          type: WebhookType.NewVisit,
-        }),
-        repositories.visitsRepository.create(visitData),
-      ]);
+      const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
 
-      const visitWebhookStatusIds = await Promise.all(
-        webhooks.map((webhook) =>
-          repositories.visitWebhookStatusesRepository.create({
-            webhookUrl: webhook.url,
-            visitId: visitData.id,
-          })
-        )
-      );
+      try {
+        const [webhooks] = await Promise.all([
+          this.repositories.webhooksRepository.getAll({
+            type: WebhookType.NewVisit,
+          }),
+          repositories.visitsRepository.create(visitData),
+        ]);
 
-      await commit();
+        const visitWebhookStatusIds = await Promise.all(
+          webhooks.map((webhook) =>
+            repositories.visitWebhookStatusesRepository.create({
+              webhookUrl: webhook.url,
+              visitId: visitData.id,
+            })
+          )
+        );
 
-      const visitWebhookStatuses = (await Promise.all(
-        visitWebhookStatusIds.map((id) => this.repositories.visitWebhookStatusesRepository.getOne({ id }))
-      )) as IVisitWebhookStatus[];
+        await commit();
 
-      await Promise.allSettled(visitWebhookStatuses.map((status) => processVisitToWebhook(this.repositories, status)));
+        const visitWebhookStatuses = (await Promise.all(
+          visitWebhookStatusIds.map((id) => this.repositories.visitWebhookStatusesRepository.getOne({ id }))
+        )) as IVisitWebhookStatus[];
+
+        await Promise.allSettled(
+          visitWebhookStatuses.map((status) => processVisitToWebhook(this.repositories, status))
+        );
+      } catch (e) {
+        console.log(e);
+
+        await rollback();
+
+        return res.status(500).json({
+          status: Status.Error,
+          data: { message: "Internal server error" },
+        });
+      } finally {
+        release();
+      }
 
       return res.status(200).json({
         status: Status.Success,
@@ -87,20 +102,14 @@ class VisitsController {
     } catch (error) {
       console.log("Visit webhook error:", error);
 
-      await rollback();
-
       return res.status(500).json({
         status: Status.Error,
         data: { message: "Internal server error" },
       });
-    } finally {
-      release();
     }
   };
 
   visitCancel = async (req: Request, res: Response) => {
-    const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
-
     try {
       const client = Joi.object({
         name: Joi.string().min(1).required(),
@@ -135,7 +144,7 @@ class VisitsController {
         });
       }
 
-      const existingVisit = await repositories.visitsRepository.getOne({ id: visitData.id });
+      const existingVisit = await this.repositories.visitsRepository.getOne({ id: visitData.id });
       if (!existingVisit) {
         return res.status(400).json({
           status: Status.Error,
@@ -143,31 +152,48 @@ class VisitsController {
         });
       }
 
-      await repositories.visitsRepository.update({
-        id: existingVisit.id,
-        isCancelled: 1,
-      });
-
-      const webhooks = await repositories.webhooksRepository.getAll({
+      const webhooks = await this.repositories.webhooksRepository.getAll({
         type: WebhookType.CancelledVisit,
       });
 
-      const visitWebhookStatusIds = await Promise.all(
-        webhooks.map((webhook) =>
-          repositories.visitWebhookStatusesRepository.create({
-            webhookUrl: webhook.url,
-            visitId: existingVisit.id,
-          })
-        )
-      );
+      const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
 
-      await commit();
+      try {
+        await repositories.visitsRepository.update({
+          id: existingVisit.id,
+          isCancelled: 1,
+        });
 
-      const visitWebhookStatuses = (await Promise.all(
-        visitWebhookStatusIds.map((id) => this.repositories.visitWebhookStatusesRepository.getOne({ id }))
-      )) as IVisitWebhookStatus[];
+        const visitWebhookStatusIds = await Promise.all(
+          webhooks.map((webhook) =>
+            repositories.visitWebhookStatusesRepository.create({
+              webhookUrl: webhook.url,
+              visitId: existingVisit.id,
+            })
+          )
+        );
 
-      await Promise.allSettled(visitWebhookStatuses.map((status) => processVisitToWebhook(this.repositories, status)));
+        await commit();
+
+        const visitWebhookStatuses = (await Promise.all(
+          visitWebhookStatusIds.map((id) => this.repositories.visitWebhookStatusesRepository.getOne({ id }))
+        )) as IVisitWebhookStatus[];
+
+        await Promise.allSettled(
+          visitWebhookStatuses.map((status) => processVisitToWebhook(this.repositories, status))
+        );
+      } catch (error) {
+        console.log("Visit webhook error:", error);
+
+        await rollback();
+
+        return res.status(500).json({
+          status: Status.Error,
+          data: { message: "Internal server error" },
+        });
+      } finally {
+        release();
+      }
 
       return res.status(200).json({
         status: Status.Success,
@@ -176,14 +202,10 @@ class VisitsController {
     } catch (error) {
       console.log("Visit webhook error:", error);
 
-      await rollback();
-
       return res.status(500).json({
         status: Status.Error,
         data: { message: "Internal server error" },
       });
-    } finally {
-      release();
     }
   };
 
@@ -249,8 +271,6 @@ class VisitsController {
   };
 
   handleRate = async (req: Request, res: Response) => {
-    const { repositories, commit, rollback, release } = await this.repositories.getTransactionalRepositories();
-
     try {
       // Validate request
       const paramsSchema = Joi.object({ visitId: Joi.string().min(1).required() });
@@ -278,8 +298,8 @@ class VisitsController {
       }
 
       const [visit, visitRate] = await Promise.all([
-        repositories.visitsRepository.getOne({ id: params.visitId, isCancelled: 0 }),
-        repositories.visitRatesRepository.getOne({ visitId: params.visitId }),
+        this.repositories.visitsRepository.getOne({ id: params.visitId, isCancelled: 0 }),
+        this.repositories.visitRatesRepository.getOne({ visitId: params.visitId }),
       ]);
 
       if (visitRate) {
@@ -303,7 +323,7 @@ class VisitsController {
         });
       }
 
-      await repositories.visitRatesRepository.create({
+      await this.repositories.visitRatesRepository.create({
         didDoctorIntroduceThemselves: body.didDoctorIntroduceThemselves,
         didDoctorGreetPatient: body.didDoctorGreetPatient,
         didDoctorIdentifyPatient: body.didDoctorIdentifyPatient,
@@ -320,8 +340,6 @@ class VisitsController {
         referralToThisClinicSummary: body.referralToThisClinicSummary,
         visitId: visit.id,
       });
-
-      await commit();
 
       // Save rate to external system (fire and forget)
       this.repositories.connectorsRepository
@@ -343,14 +361,10 @@ class VisitsController {
     } catch (error) {
       console.log("Handle rate error:", error);
 
-      await rollback();
-
       return res.status(500).json({
         status: Status.Error,
         data: { message: "Internal server error" },
       });
-    } finally {
-      release();
     }
   };
 
