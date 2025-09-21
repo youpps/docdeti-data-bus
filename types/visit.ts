@@ -45,11 +45,13 @@ interface IVisit {
   protocol: string | null;
   isProtocolSent: 1 | 0;
   isRateSent: 1 | 0;
+
+  isCancelled: 1 | 0;
 }
 
 type IInitialVisit = Omit<
   IVisit,
-  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent"
+  "feedbackType" | "feedbackSummary" | "protocol" | "isFeedbackSent" | "isProtocolSent" | "isRateSent" | "isCancelled"
 >;
 
 type IVisitDTO = Omit<

@@ -35,6 +35,8 @@ CREATE TABLE visits (
 	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE visits ADD COLUMN isCancelled BOOLEAN DEFAULT 0;
+
 CREATE TABLE visit_feedbacks (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	type  ENUM("positive", "negative", "nopurpose", "warning", "commercial") NOT NULL,

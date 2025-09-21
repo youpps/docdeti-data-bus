@@ -143,6 +143,11 @@ class VisitsController {
         });
       }
 
+      await repositories.visitsRepository.update({
+        id: existingVisit.id,
+        isCancelled: 1,
+      });
+
       const webhooks = await repositories.webhooksRepository.getAll({
         type: WebhookType.CancelledVisit,
       });
@@ -197,11 +202,11 @@ class VisitsController {
         });
       }
 
-      const visit = await this.repositories.visitsRepository.getOne({ id: params.visitId });
+      const visit = await this.repositories.visitsRepository.getOne({ id: params.visitId, isCancelled: 0 });
       if (!visit) {
         return res.status(400).json({
           status: Status.Error,
-          data: { message: "Visit is not found" },
+          data: { message: "Visit is not found or been cancelled" },
         });
       }
 
@@ -273,7 +278,7 @@ class VisitsController {
       }
 
       const [visit, visitRate] = await Promise.all([
-        repositories.visitsRepository.getOne({ id: params.visitId }),
+        repositories.visitsRepository.getOne({ id: params.visitId, isCancelled: 0 }),
         repositories.visitRatesRepository.getOne({ visitId: params.visitId }),
       ]);
 
@@ -287,7 +292,7 @@ class VisitsController {
       if (!visit) {
         return res.status(400).json({
           status: Status.Error,
-          data: { message: "Visit is not found" },
+          data: { message: "Visit is not found or been cancelled" },
         });
       }
 
@@ -381,11 +386,11 @@ class VisitsController {
         });
       }
 
-      const visit = await this.repositories.visitsRepository.getOne({ id: params.visitId });
+      const visit = await this.repositories.visitsRepository.getOne({ id: params.visitId, isCancelled: 0 });
       if (!visit) {
         return res.status(400).json({
           status: Status.Error,
-          data: { message: "Visit is not found" },
+          data: { message: "Visit is not found or been cancelled" },
         });
       }
 
