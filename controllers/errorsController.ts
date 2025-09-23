@@ -29,7 +29,7 @@ class ErrorsController {
 
       return res.status(200).json({
         status: Status.Success,
-        data: { message: "Visit has been successfully handled" },
+        data: { message: "Error has been successfully handled" },
       });
     } catch (error) {
       console.log("Visit webhook error:", error);
