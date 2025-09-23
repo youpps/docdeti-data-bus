@@ -116,6 +116,15 @@ CREATE TABLE visit_webhook_status (
   FOREIGN KEY (webhookUrl) REFERENCES webhooks(url)
 );
 
+CREATE TABLE errors (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  errorId VARCHAR(256) NOT NULL,
+  occurredAt TIMESTAMP NOT NULL,
+  serviceName VARCHAR(256) NOT NULL,
+  severity ENUM("warn", "'error'") NOT NULL,
+  message VARCHAR(512) NOT NULL
+);
+
 DROP TABLE visit_webhook_status;
 DROP TABLE visit_dialog_messages;
 DROP TABLE visit_rates;

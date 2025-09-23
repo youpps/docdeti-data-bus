@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import { Repositories } from "../repositories";
 import { Status } from "../types/status";
-import { IInitialVisit, IVisitDTO, VisitClientSex, VisitType } from "../types/visit";
+import { IVisitDTO, VisitClientSex, VisitType } from "../types/visit";
 import { IVisitDialogMessage, VisitDialogMessageSender } from "../types/visitDialogMessage";
-import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
 import { VisitFeedbackType } from "../types/visitFeedback";
+import { IVisitWebhookStatus, processVisitToWebhook } from "../types/visitWebhookStatus";
 import { WebhookType } from "../types/webhook";
 
 class VisitsController {

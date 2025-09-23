@@ -100,12 +100,34 @@ class ConnectorsRepository {
 
   //     address: Joi.string().min(1).required(),
 
-  async saveProtocol(visit: IVisit): Promise<boolean> {
-    return true;
+  async saveProtocol(visit: { protocol: string; id: string }): Promise<boolean> {
+    const res = await fetch(process.env.MIS_CONNECTOR_URL + `/visit${visit.id}/protocol`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        protocol: visit.protocol,
+      }),
+    });
+
+    const json = await res.json();
+
+    return json.status === Status.Success;
   }
 
   async saveRate(visitRate: IVisitRate): Promise<boolean> {
-    return true;
+    const res = await fetch(process.env.AMO_CONNECTOR_URL + `/visit/${visitRate.visitId}/rate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(visitRate),
+    });
+
+    const json = await res.json();
+
+    return json.status === Status.Success;
   }
 }
 

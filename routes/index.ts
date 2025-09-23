@@ -15,6 +15,8 @@ function routes(repositories: Repositories) {
 
   router.get("/visit/fake", controllers.visitsController.fakeVisit);
 
+  router.post("/errors/handle", controllers.errorsController.handle)
+
   // API
   //   router.post()
   return router;

@@ -1,0 +1,1 @@
+const createErrorQuery = () => `INSERT INTO errors(errorId, occurredAt, serviceName, severity, message) VALUES (:errorId, :occurredAt, :serviceName, :severity, :message);`

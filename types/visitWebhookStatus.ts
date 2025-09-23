@@ -55,7 +55,10 @@ const processProtocolToConnectors = async (repositories: Repositories, visit: IV
   try {
     if (!visit.protocol) return;
 
-    const protocolSent = await repositories.connectorsRepository.saveProtocol(visit);
+    const protocolSent = await repositories.connectorsRepository.saveProtocol({
+      id: visit.id,
+      protocol: visit.protocol,
+    });
 
     if (protocolSent) {
       await repositories.visitsRepository.update({
