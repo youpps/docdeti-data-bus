@@ -37,7 +37,6 @@ CREATE TABLE visits (
 	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE visits ADD COLUMN
 
 CREATE TABLE visit_feedbacks (
 	id INT PRIMARY KEY AUTO_INCREMENT,
@@ -71,7 +70,7 @@ CREATE TABLE visit_rates (
 
     -- Открытые (текстовые) вопросы
     referralToThisClinicSummary TEXT,
-    referralToAnotherClinicSummary TEXT
+    referralToAnotherClinicSummary TEXT,
 	
 	createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

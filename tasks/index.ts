@@ -5,13 +5,13 @@ import { ProcessRequestsToConnectors } from "./processRequestsToConnectors";
 import { ProcessRequestsToWebhooks } from "./processRequestsToWebhooks";
 
 class Tasks {
-  static TASK_OPTIONS: TaskOptions = {
+  private static TASK_OPTIONS: TaskOptions = {
     timezone: "Europe/Moscow",
   };
 
-  static PROCESS_TASK_EXPRESSION = "5 * * * *";
+  private static PROCESS_TASK_EXPRESSION = "5 * * * *";
 
-  static init(repositories: Repositories) {
+  static initialize(repositories: Repositories) {
     cron.schedule(
       Tasks.PROCESS_TASK_EXPRESSION,
       () => ProcessRequestsToConnectors.launch(repositories),

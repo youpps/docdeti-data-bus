@@ -5,6 +5,7 @@ import morgan from "morgan";
 import createDatabase from "./database";
 import { Repositories } from "./repositories";
 import { routes } from "./routes";
+import { Tasks } from "./tasks";
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ async function start() {
     });
 
     const repositories = Repositories.initialize(database);
+
+    Tasks.initialize(repositories);
 
     app.use(
       express.urlencoded({
