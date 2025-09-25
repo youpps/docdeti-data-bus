@@ -500,9 +500,9 @@ class VisitsController {
         age: 35,
       },
       child: {
-        name: "Алексей",
-        surname: "Смирнов",
-        patronymic: "Павлович",
+        name: "Ангелина",
+        surname: "Смирнова",
+        patronymic: "Павловна",
         sex: VisitClientSex.Female,
         age: 6,
       },

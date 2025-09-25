@@ -98,8 +98,6 @@ class ConnectorsRepository {
     }
   }
 
-  //     address: Joi.string().min(1).required(),
-
   async saveProtocol(visit: { protocol: string; id: string }): Promise<boolean> {
     const res = await fetch(process.env.MIS_CONNECTOR_URL + `/visit/${visit.id}/protocol`, {
       method: "POST",
