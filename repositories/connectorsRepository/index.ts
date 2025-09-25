@@ -101,8 +101,6 @@ class ConnectorsRepository {
   //     address: Joi.string().min(1).required(),
 
   async saveProtocol(visit: { protocol: string; id: string }): Promise<boolean> {
-    console.log(visit);
-
     const res = await fetch(process.env.MIS_CONNECTOR_URL + `/visit/${visit.id}/protocol`, {
       method: "POST",
       headers: {
@@ -112,7 +110,6 @@ class ConnectorsRepository {
         protocol: visit.protocol,
       }),
     });
-    console.log(await res.text());
 
     const json = await res.json();
 
