@@ -9,7 +9,7 @@ class Tasks {
     timezone: "Europe/Moscow",
   };
 
-  private static PROCESS_TASK_EXPRESSION = "5 * * * *";
+  private static PROCESS_TASK_EXPRESSION = "*/3 * * * *";
 
   static initialize(repositories: Repositories) {
     cron.schedule(
