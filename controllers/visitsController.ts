@@ -245,7 +245,10 @@ class VisitsController {
       });
 
       this.repositories.connectorsRepository
-        .saveProtocol(body.protocol)
+        .saveProtocol({
+          id: visit.id,
+          protocol: body.protocol,
+        })
         .then((isOk) => {
           if (!isOk) return;
 
