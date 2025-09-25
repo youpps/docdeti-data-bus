@@ -67,7 +67,7 @@ const processProtocolToConnectors = async (repositories: Repositories, visit: IV
       });
     }
   } catch (error) {
-    console.error(`Failed to process protocol for visit ${visit.id}:`, error);
+    console.log(`Failed to process protocol for visit ${visit.id}:`, error);
   }
 };
 
