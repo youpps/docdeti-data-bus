@@ -103,7 +103,7 @@ class ConnectorsRepository {
   async saveProtocol(visit: { protocol: string; id: string }): Promise<boolean> {
     console.log(visit);
 
-    const res = await fetch(process.env.MIS_CONNECTOR_URL + `/visit${visit.id}/protocol`, {
+    const res = await fetch(process.env.MIS_CONNECTOR_URL + `/visit/${visit.id}/protocol`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
